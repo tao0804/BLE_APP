@@ -48,7 +48,7 @@
 
 const app_info_t app_info __attribute__((at(APP_INFO_ADDR)))=
 {
-	.co_default_bdname = "proj_template",
+	.co_default_bdname = "encoder",
 	.default_use_ext_32k = USE_EXT_32K,
 	.default_hz32000 = HZ32000,
 	.default_en_calib_rc = EN_CALIB_RC,
