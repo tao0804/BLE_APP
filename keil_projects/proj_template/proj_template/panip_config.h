@@ -23,7 +23,7 @@
 #define DBG_SYS_EN              (0)
 
 #define ENABLE_UART0			(0)
-#define ENABLE_UART1			(1)
+#define ENABLE_UART1			(0)
 #define USE_EXT_32K 	        (0) //macro of use external 32k 		
 #define SLEEP_EN		        (1) //maro of whether to use low power
 #define PN102B			        (1)

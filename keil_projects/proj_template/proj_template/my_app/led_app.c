@@ -28,11 +28,11 @@ static void led_ctrlStatus(bool light)
 }
 
 void led_resetInit(void)
-{
+{// led 5s р╩иа
 	led_ctrlStatus(LED_OFF);
 	ledInfo.ledMode = LED_MODE_OFF;
-	ledInfo.ledOffTime = 180;
-	ledInfo.ledOnTime = 20;
+	ledInfo.ledOffTime = 490;
+	ledInfo.ledOnTime = 10;
 	led_setMode(LED_MODE_BLINK);
 }
 

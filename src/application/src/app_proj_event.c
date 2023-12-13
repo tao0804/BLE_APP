@@ -231,7 +231,7 @@ void app_connection_req_ind_func ( uint8_t conidx, struct gapc_connection_req_in
 	if(ble_has_been_connected == FALSE)
 	{
 		ble_has_been_connected = TRUE;	// 已被连接过
-		// led_setMode(LED_MODE_OFF);
+		// led_setMode(LED_MODE_OFF);	// 小灯5s一闪
 	}
 	#endif
 
