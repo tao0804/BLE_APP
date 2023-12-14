@@ -41,50 +41,27 @@ typedef void (FUNC_PTR)(void);
 #endif
 
 //PANCHIP MAC
-#define MAC0_ADDR 0x400050
-#define MAC1_ADDR 0x400054
+// panlink¹öÂëÉÕÂ¼mac, panlink mac ¾ÍÊÇÁ¿²úµÄÊ±ºòÉÕÂ¼½øÐ¾Æ¬µÄ,ÉÕÂ¼Æ÷¹öÂë
+// #define MAC0_ADDR 0x400050
+// #define MAC1_ADDR 0x400054
 
 //FT MAC
-//#define MAC0_ADDR 0x400058
-//#define MAC1_ADDR 0x40005c 
+// Ð¾Æ¬Î¨Ò»mac
+#define MAC0_ADDR 0x400058
+#define MAC1_ADDR 0x40005c
 
 void FMC_ReadRom(uint32_t u32Addr, uint8_t *rom_data)
 {
 	SYS_UnlockReg();
 	FMC_ENABLE_ISP();
 	uint32_t data;
-	data = (FMC_Read(u32Addr));
+	data = (FMC_ReadUID(u32Addr));	// FMC_Read¸ÄÎªFMC_ReadUID
 	memcpy(rom_data, &data, sizeof(uint32_t));
 	SYS_LockReg();
 }
 
 void Set_Device_MacAddr(void)
 {
-/*
-	uint8_t addrvalue[6] = {0};
-	
-	SYS_UnlockReg();
-	FMC_Open();
-	FMC->ISPCMD = FMC_ISPCMD_READ_UID;
-	FMC->ISPADDR = 0x50;
-	FMC->ISPTRG = FMC_ISPTRG_ISPGO_Msk;
-	while (FMC->ISPTRG & FMC_ISPTRG_ISPGO_Msk) ;
-	addrvalue[0] = FMC->ISPDAT & 0xff;
-	addrvalue[1] = FMC->ISPDAT >> 8;
-	addrvalue[2] = FMC->ISPDAT >> 16;
-	addrvalue[3] = FMC->ISPDAT >> 24;
-	
-	FMC->ISPCMD = FMC_ISPCMD_READ_UID;
-	FMC->ISPADDR = 0x54;
-	FMC->ISPTRG = FMC_ISPTRG_ISPGO_Msk;
-	while (FMC->ISPTRG & FMC_ISPTRG_ISPGO_Msk) ;
-	addrvalue[4] = FMC->ISPDAT & 0xff;
-	addrvalue[5] = FMC->ISPDAT >> 8;
-	
-	FMC_Close();
-	SYS_LockReg();
-	memcpy(app_var.co_default_bdaddr.addr,addrvalue,BD_ADDR_LEN);
-*/
 	uint8_t addrvalue[8];
 	FMC_ReadRom(MAC0_ADDR, addrvalue);
 	FMC_ReadRom(MAC1_ADDR, addrvalue + 4);
