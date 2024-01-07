@@ -38,8 +38,8 @@ void proj_template_start_advertising(void)
 
 	msg.op.code	 = GAPM_ADV_UNDIRECT;
 	msg.op.addr_src = GAPM_STATIC_ADDR;
-	msg.intv_min	 =	1600;			//APP_ADV_INT_MIN;				
-	msg.intv_max	 =	1600;			//1000ms
+	msg.intv_min	 =	160;			//APP_ADV_INT_MIN;				
+	msg.intv_max	 =	160;			//100ms
 	msg.channel_map = APP_ADV_CHMAP;
 
 	msg.info.host.mode = GAP_GEN_DISCOVERABLE;

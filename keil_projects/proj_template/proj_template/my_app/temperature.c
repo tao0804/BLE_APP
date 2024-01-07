@@ -18,7 +18,7 @@ static uint16 temperCnt;	// 采温度完成次数
 static uint8 temperTimerCnt;	// 定时器回调进入计数
 
 /**
- * @brief 保存温度值到temperTable，同时更新temperCnt
+ * @brief 保存温度值到temperTable,同时更新temperCnt
  * @param value 温度值
  */
 static void saveTemperValue(int8 value)
@@ -27,10 +27,9 @@ static void saveTemperValue(int8 value)
 	temperCnt++;
 }
 
-#define TEMPER_VALUE_MAX_CFG 120
-#define TEMPER_VALUE_MIN_CFG -120
-#define TEMPER_VALUE_OVER_MAX 127
-#define TEMPER_VALUE_LESS_MIN -128
+// 温度测量范围应由硬件给出电压电阻公式判断,没有运放,即没有限制
+#define TEMPER_VALUE_MAX_CFG	200
+#define TEMPER_VALUE_MIN_CFG	200
 /**
  * @brief 真实温度 （摄氏度） 转 TemperValue，超过最大最小显示特殊值
  * @param value 真实温度
@@ -39,15 +38,15 @@ static void saveTemperValue(int8 value)
 static inline int8 C_TO_TEMPER_VALUE(float value)
 {
 	int32 t;
-	// round函数 四舍五入
 	t = (int32)round((value - ZERO_TEMPER_VALUE_C) / PRECISION_TEMPER_VALUE_C);
-	if(t > TEMPER_VALUE_MAX_CFG)
-		t = TEMPER_VALUE_OVER_MAX;
-	else if(t < TEMPER_VALUE_MIN_CFG)
-		t = TEMPER_VALUE_LESS_MIN;
+	// if(t > TEMPER_VALUE_MAX_CFG)
+	// 	t = TEMPER_VALUE_OVER_MAX;
+	// else if(t < TEMPER_VALUE_MIN_CFG)
+	// 	t = TEMPER_VALUE_LESS_MIN;
 	return (int8)t;
 }
 
+// ntcB值和25度对应的阻值(待改)
 #define NTC_B_VALUE_CFG 4250
 #define NTC_25_C_RES_CFG 100000
 /**
@@ -62,8 +61,7 @@ static int8 adcVoltageToTemperValue(float voltage)
 	float r;	// 某温度时ntc实际阻值(Ohm)
 	int8 temperValue;
 
-	// r = ( ( ( 6.25 - voltage ) / ( 6.25 + voltage ) ) * 100000 );	// 运放分析采集的电压与ntc阻值关系
-	r = 1000 * (1500 - 200 * voltage) / (8.75 + 3 * voltage);
+	r = 1000 * (1500 - 200 * voltage) / (8.75 + 3 * voltage);	// 运放分析采集的电压与ntc阻值关系(待改)
 	t = 1.0 / ( 1.0 / ( 273.15 + 25 ) + 1.0 / NTC_B_VALUE_CFG * log( r / ( NTC_25_C_RES_CFG ) ) ) - 273.15;
 	temperValue = C_TO_TEMPER_VALUE(t);
 	return temperValue;
