@@ -112,6 +112,7 @@ __STATIC_INLINE void TIMER_Stop(TIMER_T *timer)
   */
 __STATIC_INLINE void TIMER_Reset(TIMER_T *timer)
 {
+	// fix:the brief is not correct
     timer->CTL |= TIMER_CTL_RSTCNT_Msk;
 }
 

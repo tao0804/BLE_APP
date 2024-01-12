@@ -45,6 +45,7 @@
 #include "mcu_hal.h"
 #include "led_app.h"
 #include "key_app.h"
+#include "rev_app.h"
 
 const app_info_t app_info __attribute__((at(APP_INFO_ADDR)))=
 {
@@ -97,7 +98,7 @@ void ble_normal_reset_init()
 	/* 注意：mcu_gpio_user_init()放在periph_init()内部的最后一行io保持不可以，放在periph_init()执行完出来的下一行才行！*/
 	mcu_gpio_user_init();	// 初始化gpio
 	mcu_gpio_en_pow(FALSE);	// 首次复位拉低POW_EN，需要长按1s后开机
-	
+
 	printf("CPU @ %dHz,%s\n", SystemCoreClock, app_info.co_default_bdname);
 	#if(PROJ_OTA)
 	bootloader_start();
@@ -196,6 +197,8 @@ int main(void)
 #endif
 	stack_sp_restore();
 	ble_init();
+	mcu_rev_init();
+	rev_start();
 	ble_stack_process();
 }
 
