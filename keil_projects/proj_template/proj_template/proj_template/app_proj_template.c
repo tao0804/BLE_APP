@@ -25,6 +25,7 @@
 #include "temperature.h"
 #include "led_app.h"
 #include "key_app.h"
+#include "rev_app.h"
 
 static struct app_proj_template_env_tag app_proj_template_env;
 void app_proj_template_init(void)
@@ -32,6 +33,7 @@ void app_proj_template_init(void)
 	memset(&app_proj_template_env, 0, sizeof(app_proj_template_env));
 	
 	temper_resetInit();
+	rev_resetInit();
 	/* 注意：配置定时器放在此函数里没问题，放在appm_init()外部有问题，会导致无法进定时回调！
 			函数调用关系：ble_normal_reset_init() -> user_code_start() -> appm_init() -> app_init_ind_func()
 			设置定时器放在appm_init()内部没问题，但是放在appm_init()外部就不行，
@@ -154,7 +156,9 @@ static int app_sample_temper_handler(ke_msg_id_t const msgid,
                                      ke_task_id_t const dest_id,
                                      ke_task_id_t const src_id)
 {
-	temper_sampleTemperTimerCb();	// 1分钟定时器回调函数，处理定时采温度任务
+	// todo:休眠前操作
+	rev_resetInit();	// 上下顺序很重要,adc采样完成有阻塞
+	temper_sampleTemperTimerCb();	// 1分钟定时器回调函数，处理定时采温度任务 ?
 	((ke_timer_set_handler)SVC_ke_timer_set)(APP_SAMPLE_TEMPER_TIMER, TASK_APP, 60*100);	// 开启下一次定时
 	return (KE_MSG_CONSUMED);
 }

@@ -2,21 +2,9 @@
 #include "gpio.h"
 #include "timer.h"
 #include "led_app.h"
+#include "mcu_hal.h"
 #include "stack_svc_api.h"
 
-
-// static void rev_freqMeasureTimer1_off(void)
-// {
-// 	if(TIMER_IS_ACTIVE(TIMER0))
-// 	{
-// 		TIMER_Close(TIMER0);	// TIMER_T *timer
-// 	}
-// }
-// static void rev_freqMeasureTimer1_on(void)
-// {
-// 	rev_freqMeasureTimer1_off();
-// 	TIMER_Open(TIMER0, TIMER_ONESHOT_MODE, 100);
-// }
 
 RevArg_t revArg;
 
@@ -56,7 +44,10 @@ void mcu_gpio01_isr(void)
 			revArg.revTimerCnt = TIMER_GetCounter(TIMER0);
 			revArg.revTime = revArg.revTimerCnt / (TIMER_GetModuleClock(TIMER0) / 1000);	// psc = 1
 			revArg.targetRPM = 60 * 1000 / revArg.revTime;	// 目标每分钟转速
+			mcu_gpio_en_hall(FALSE);
 			TIMER_Reset(TIMER0);
+			GPIO_DisableInt(P1, 3);
+			TIMER_DisableInt(TIMER0);
 		}
 		else
 		{
@@ -72,6 +63,7 @@ void mcu_TMR0_isr(void)
 	// indicates Timer time-out interrupt occurred or not
 	if(TIMER_GetIntFlag(TIMER0))
 	{
+		revArg.targetRPM = 0;	// 目标每分钟转速
 		TIMER_Reset(TIMER0);
 		TIMER_ClearIntFlag(TIMER0);
 		revArg.revFlag = !revArg.revFlag;
@@ -101,11 +93,15 @@ void mcu_rev_init(void)
 	((interrupt_register_handler)SVC_interrupt_register)(TMR0_IRQ, mcu_TMR0_isr);
 }
 
-
-
 void rev_start(void)
 {
 	mcu_gpio_en_hall(TRUE);
+	// delay?
 	NVIC_EnableIRQ(GPIO01_IRQn);
 }
 
+void rev_resetInit(void)
+{
+	mcu_rev_init();
+	rev_start();
+}

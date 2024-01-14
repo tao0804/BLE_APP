@@ -14,6 +14,7 @@ typedef struct RevArg{
 void mcu_gpio_en_hall(bool en);
 void mcu_rev_init(void);
 void rev_start(void);
+void rev_resetInit(void);
 
 #endif
 

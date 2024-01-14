@@ -38,7 +38,7 @@ extern TemperReadCfg_t g_temperReadCfg;
 int8 temper_getTemperValue(uint16 cnt);
 uint16 temper_getTemperCnt(void);
 void temper_sampleTemperTimerCb(void);
-int8 temper_sampleTemper(void);
+float temper_sampleTemper(void);
 void temper_resetInit(void);
 
 #endif //__TEMPERATURE_H_

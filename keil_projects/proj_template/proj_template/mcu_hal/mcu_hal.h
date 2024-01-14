@@ -49,7 +49,9 @@ void mcu_adc_isr(void);
 
 ////////////////////////////////////////////adc_user/////////////////////////////////////////////
 enum {
-	MCU_P12_ADC_CH2 = 0,
+	MCU_P14_ADC_CH4 = 0,
+	MCU_P31_ADC_CH7,
+	MCU_P12_ADC_CH2,
 	MCU_P13_ADC_CH3,
 	MCU_ADC_NUM,
 };

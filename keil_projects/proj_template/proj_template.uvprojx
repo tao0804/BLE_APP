@@ -313,7 +313,7 @@
           </ArmAdsMisc>
           <Cads>
             <interw>1</interw>
-            <Optim>4</Optim>
+            <Optim>1</Optim>
             <oTime>1</oTime>
             <SplitLS>0</SplitLS>
             <OneElfS>1</OneElfS>
@@ -747,6 +747,11 @@
               <FileName>key_app.c</FileName>
               <FileType>1</FileType>
               <FilePath>.\proj_template\my_app\key_app.c</FilePath>
+            </File>
+            <File>
+              <FileName>rev_app.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\proj_template\my_app\rev_app.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -2186,6 +2191,11 @@
               <FileName>key_app.c</FileName>
               <FileType>1</FileType>
               <FilePath>.\proj_template\my_app\key_app.c</FilePath>
+            </File>
+            <File>
+              <FileName>rev_app.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\proj_template\my_app\rev_app.c</FilePath>
             </File>
           </Files>
         </Group>

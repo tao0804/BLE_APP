@@ -45,7 +45,6 @@
 #include "mcu_hal.h"
 #include "led_app.h"
 #include "key_app.h"
-#include "rev_app.h"
 
 const app_info_t app_info __attribute__((at(APP_INFO_ADDR)))=
 {
@@ -197,8 +196,6 @@ int main(void)
 #endif
 	stack_sp_restore();
 	ble_init();
-	mcu_rev_init();
-	rev_start();
 	ble_stack_process();
 }
 
