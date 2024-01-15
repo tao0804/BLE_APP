@@ -151,24 +151,24 @@ __STATIC int gattc_write_req_ind_handler(ke_msg_id_t const msgid,
 			}
 			break;
 
-			case PROJ_TEMPLATE_IDX_CONFIG_VAL:
-			{
-				if(param->length == sizeof(TemperReadCfg_t))
-				{
-					TemperReadCfg_t tmpCfg;
-					uint16 cnt = temper_getTemperCnt();
-					memcpy(&tmpCfg, &param->value[0], sizeof(TemperReadCfg_t));
-					if(tmpCfg.readLen != 0 && tmpCfg.startCnt != 0 && tmpCfg.readLen <= PROJ_TEMPLATE_SERVER_PACKET_SIZE)
-					{
-						if((cnt <= TEMPER_TABLE_MAX_LEN && tmpCfg.startCnt + tmpCfg.readLen - 1 <= cnt) ||
-						   (cnt > TEMPER_TABLE_MAX_LEN && tmpCfg.startCnt > cnt - TEMPER_TABLE_MAX_LEN && tmpCfg.startCnt + tmpCfg.readLen - 1 <= cnt))
-						{
-							memcpy(&g_temperReadCfg, &tmpCfg, sizeof(TemperReadCfg_t));
-						}
-					}
-				}
-			}
-			break;
+			// case PROJ_TEMPLATE_IDX_CONFIG_VAL:
+			// {
+			// 	if(param->length == sizeof(TemperReadCfg_t))
+			// 	{
+			// 		TemperReadCfg_t tmpCfg;
+			// 		uint16 cnt = temper_getTemperCnt();
+			// 		memcpy(&tmpCfg, &param->value[0], sizeof(TemperReadCfg_t));
+			// 		if(tmpCfg.readLen != 0 && tmpCfg.startCnt != 0 && tmpCfg.readLen <= PROJ_TEMPLATE_SERVER_PACKET_SIZE)
+			// 		{
+			// 			if((cnt <= TEMPER_TABLE_MAX_LEN && tmpCfg.startCnt + tmpCfg.readLen - 1 <= cnt) ||
+			// 			   (cnt > TEMPER_TABLE_MAX_LEN && tmpCfg.startCnt > cnt - TEMPER_TABLE_MAX_LEN && tmpCfg.startCnt + tmpCfg.readLen - 1 <= cnt))
+			// 			{
+			// 				memcpy(&g_temperReadCfg, &tmpCfg, sizeof(TemperReadCfg_t));
+			// 			}
+			// 		}
+			// 	}
+			// }
+			// break;
 			
 			default:
 			{
@@ -214,35 +214,35 @@ __STATIC int gattc_read_req_ind_handler(ke_msg_id_t const msgid, struct gattc_re
 	{
 		switch (att_idx)
 		{
-			case PROJ_TEMPLATE_IDX_TEMPER_VAL:
-			{
-				length = 1;
-			}
-			break;
+			// case PROJ_TEMPLATE_IDX_TEMPER_VAL:
+			// {
+			// 	length = 1;
+			// }
+			// break;
 
-			case PROJ_TEMPLATE_IDX_COUNT_VAL:
-			{
-				length = 2;
-			}
-			break;
+			// case PROJ_TEMPLATE_IDX_COUNT_VAL:
+			// {
+			// 	length = 2;
+			// }
+			// break;
 
-			case PROJ_TEMPLATE_IDX_CONST_VAL:
-			{
-				length = sizeof(g_temperCfg);
-			}
-			break;
+			// case PROJ_TEMPLATE_IDX_CONST_VAL:
+			// {
+			// 	length = sizeof(g_temperCfg);
+			// }
+			// break;
 
-			case PROJ_TEMPLATE_IDX_HISTORY_VAL:
-			{
-				length = g_temperReadCfg.readLen * 1;
-			}
-			break;
+			// case PROJ_TEMPLATE_IDX_HISTORY_VAL:
+			// {
+			// 	length = g_temperReadCfg.readLen * 1;
+			// }
+			// break;
 
-			case PROJ_TEMPLATE_IDX_CONFIG_VAL:
-			{
-				length = sizeof(g_temperReadCfg);
-			}
-			break;
+			// case PROJ_TEMPLATE_IDX_CONFIG_VAL:
+			// {
+			// 	length = sizeof(g_temperReadCfg);
+			// }
+			// break;
 
 			// case PROJ_TEMPLATE_IDX_VBATT_VAL:
 			// {
@@ -298,41 +298,41 @@ __STATIC int gattc_read_req_ind_handler(ke_msg_id_t const msgid, struct gattc_re
 	{
 		switch (att_idx)
 		{
-			case PROJ_TEMPLATE_IDX_TEMPER_VAL:
-			{
-				int8 t = temper_sampleTemper();
-				memcpy(cfm->value, &t, sizeof(t));
-			}
-			break;
+			// case PROJ_TEMPLATE_IDX_TEMPER_VAL:
+			// {
+			// 	int8 t = temper_sampleTemper();
+			// 	memcpy(cfm->value, &t, sizeof(t));
+			// }
+			// break;
 
-			case PROJ_TEMPLATE_IDX_COUNT_VAL:
-			{
-				uint16 cnt = temper_getTemperCnt();
-				memcpy(cfm->value, &cnt, sizeof(cnt));
-			}
-			break;
+			// case PROJ_TEMPLATE_IDX_COUNT_VAL:
+			// {
+			// 	uint16 cnt = temper_getTemperCnt();
+			// 	memcpy(cfm->value, &cnt, sizeof(cnt));
+			// }
+			// break;
 
-			case PROJ_TEMPLATE_IDX_CONST_VAL:
-			{
-				memcpy(cfm->value, &g_temperCfg, sizeof(g_temperCfg));
-			}
-			break;
+			// case PROJ_TEMPLATE_IDX_CONST_VAL:
+			// {
+			// 	memcpy(cfm->value, &g_temperCfg, sizeof(g_temperCfg));
+			// }
+			// break;
 
-			case PROJ_TEMPLATE_IDX_HISTORY_VAL:
-			{
-				uint16 i = 0;
-				for(; i < length; i++)
-				{
-					((int8*)cfm->value)[i] = temper_getTemperValue(g_temperReadCfg.startCnt + i);
-				}
-			}
-			break;
+			// case PROJ_TEMPLATE_IDX_HISTORY_VAL:
+			// {
+			// 	uint16 i = 0;
+			// 	for(; i < length; i++)
+			// 	{
+			// 		((int8*)cfm->value)[i] = temper_getTemperValue(g_temperReadCfg.startCnt + i);
+			// 	}
+			// }
+			// break;
 
-			case PROJ_TEMPLATE_IDX_CONFIG_VAL:
-			{
-				memcpy(cfm->value, &g_temperReadCfg, sizeof(g_temperReadCfg));
-			}
-			break;
+			// case PROJ_TEMPLATE_IDX_CONFIG_VAL:
+			// {
+			// 	memcpy(cfm->value, &g_temperReadCfg, sizeof(g_temperReadCfg));
+			// }
+			// break;
 
 			// case PROJ_TEMPLATE_IDX_VBATT_VAL:
 			// {
