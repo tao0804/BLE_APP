@@ -24,6 +24,7 @@
 #include "stack_svc_api.h"
 
 #include "temperature.h"
+#include "rev_app.h"
 
 __STATIC int proj_template_server_enable_req_handler(ke_msg_id_t const msgid,
 								   struct proj_template_server_enable_req const *param,
@@ -214,53 +215,23 @@ __STATIC int gattc_read_req_ind_handler(ke_msg_id_t const msgid, struct gattc_re
 	{
 		switch (att_idx)
 		{
-			// case PROJ_TEMPLATE_IDX_TEMPER_VAL:
-			// {
-			// 	length = 1;
-			// }
-			// break;
+			case PROJ_TEMPLATE_IDX_TEMP_VAL:
+			{
+				length = 13;
+			}
+			break;
 
-			// case PROJ_TEMPLATE_IDX_COUNT_VAL:
-			// {
-			// 	length = 2;
-			// }
-			// break;
+			case PROJ_TEMPLATE_IDX_VBATT_VAL:
+			{
+				length = 14;
+			}
+			break;
 
-			// case PROJ_TEMPLATE_IDX_CONST_VAL:
-			// {
-			// 	length = sizeof(g_temperCfg);
-			// }
-			// break;
-
-			// case PROJ_TEMPLATE_IDX_HISTORY_VAL:
-			// {
-			// 	length = g_temperReadCfg.readLen * 1;
-			// }
-			// break;
-
-			// case PROJ_TEMPLATE_IDX_CONFIG_VAL:
-			// {
-			// 	length = sizeof(g_temperReadCfg);
-			// }
-			// break;
-
-			// case PROJ_TEMPLATE_IDX_VBATT_VAL:
-			// {
-			// 	length = 1;
-			// }
-			// break;
-
-			// case PROJ_TEMPLATE_IDX_BINDING_VAL:
-			// {
-			// 	length = 1;
-			// }
-			// break;
-
-			// case PROJ_TEMPLATE_IDX_DISCOVER_VAL:
-			// {
-			// 	length = 1;
-			// }
-			// break;
+			case PROJ_TEMPLATE_IDX_REVPERMINUTE_VAL:
+			{
+				length = 4;
+			}
+			break;
 
 			case PROJ_TEMPLATE_IDX_S2C_USER_DESC:
 			{
@@ -298,54 +269,28 @@ __STATIC int gattc_read_req_ind_handler(ke_msg_id_t const msgid, struct gattc_re
 	{
 		switch (att_idx)
 		{
-			// case PROJ_TEMPLATE_IDX_TEMPER_VAL:
+			// case PROJ_TEMPLATE_IDX_TEMP_VAL:
 			// {
-			// 	int8 t = temper_sampleTemper();
-			// 	memcpy(cfm->value, &t, sizeof(t));
+			// 	uint8_t Sendata[PROJ_TEMPLATE_SERVER_PACKET_SIZE] = {0};
+			// 	float t = temperCfgStructure.currentTemp;
+			// 	uint8 len = sprintf((char*)Sendata, "temp = %2.2f", t);
+			// 	memcpy(cfm->value, Sendata, len);
 			// }
 			// break;
 
-			// case PROJ_TEMPLATE_IDX_COUNT_VAL:
-			// {
-			// 	uint16 cnt = temper_getTemperCnt();
-			// 	memcpy(cfm->value, &cnt, sizeof(cnt));
-			// }
-			// break;
+			case PROJ_TEMPLATE_IDX_VBATT_VAL:
+			{
+				uint8_t Sendata[PROJ_TEMPLATE_SERVER_PACKET_SIZE] = {0};
+				float v = temperCfgStructure.vccVoltage * 2;
+				uint8 len = sprintf((char*)Sendata, "voltage = %.1f", v);
+				memcpy(cfm->value, Sendata, len);
+			}
+			break;
 
-			// case PROJ_TEMPLATE_IDX_CONST_VAL:
+			// case PROJ_TEMPLATE_IDX_REVPERMINUTE_VAL:
 			// {
-			// 	memcpy(cfm->value, &g_temperCfg, sizeof(g_temperCfg));
-			// }
-			// break;
-
-			// case PROJ_TEMPLATE_IDX_HISTORY_VAL:
-			// {
-			// 	uint16 i = 0;
-			// 	for(; i < length; i++)
-			// 	{
-			// 		((int8*)cfm->value)[i] = temper_getTemperValue(g_temperReadCfg.startCnt + i);
-			// 	}
-			// }
-			// break;
-
-			// case PROJ_TEMPLATE_IDX_CONFIG_VAL:
-			// {
-			// 	memcpy(cfm->value, &g_temperReadCfg, sizeof(g_temperReadCfg));
-			// }
-			// break;
-
-			// case PROJ_TEMPLATE_IDX_VBATT_VAL:
-			// {
-			// }
-			// break;
-
-			// case PROJ_TEMPLATE_IDX_BINDING_VAL:
-			// {
-			// }
-			// break;
-
-			// case PROJ_TEMPLATE_IDX_DISCOVER_VAL:
-			// {
+			// 	int16 r = revArg.targetRPM;
+			// 	memcpy(cfm->value, &r, sizeof(r));
 			// }
 			// break;
 

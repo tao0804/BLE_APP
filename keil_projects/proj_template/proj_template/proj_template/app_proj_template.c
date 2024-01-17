@@ -158,7 +158,8 @@ static int app_sample_temper_handler(ke_msg_id_t const msgid,
 {
 	// todo:休眠前操作
 	rev_resetInit();	// 上下顺序很重要,adc采样完成有阻塞
-	temper_sampleTemperTimerCb();	// 1分钟定时器回调函数，处理定时采温度任务 ?
+	// temper_sampleTemperTimerCb();	// 1分钟定时器回调函数,处理定时采温度任务?事实上我不需要周期采和存了
+	temper_sampleTemper();
 	((ke_timer_set_handler)SVC_ke_timer_set)(APP_SAMPLE_TEMPER_TIMER, TASK_APP, 60*100);	// 开启下一次定时
 	return (KE_MSG_CONSUMED);
 }

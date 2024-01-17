@@ -11,6 +11,7 @@ const TemperCfg_t g_temperCfg = {
 	.sampleTemperPeriod = SAMPLE_TEMPER_PERIOD,
 };
 
+TemperCfg_t temperCfgStructure;	// 用来放目标变量
 TemperReadCfg_t g_temperReadCfg;
 
 static int8 temperTable[TEMPER_TABLE_MAX_LEN];	// 存放历史温度数据
@@ -115,24 +116,21 @@ void temper_sampleTemperTimerCb(void)
 }
 
 // 阻塞采一次温度,不存储
-float temper_sampleTemper(void)
+void temper_sampleTemper(void)
 {
-	float v1,v2;
-	int8 t;
-
+	float v;
 	mcu_gpio_en_ldo(TRUE);
 	mcu_adc_user_init();
 	while(!mcu_adc_main());	// 阻塞到采样完成
 	mcu_gpio_en_ldo(FALSE);
-	v1 = mcu_adc_get_voltage(MCU_P31_ADC_CH7);
-	v2 = mcu_adc_get_voltage(MCU_P14_ADC_CH4);
+	temperCfgStructure.vccVoltage = mcu_adc_get_voltage(MCU_P31_ADC_CH7);
+	v = mcu_adc_get_voltage(MCU_P14_ADC_CH4);
 #if ADC_VREF_CALIBRATION_EN
 	float vref;
 	vref = mcu_adc_get_voltage(MCU_P13_ADC_CH3);
 	v = v * VREF_VOLTAGE / vref;	// 校准温漂后的v
 #endif
-	t = adcVoltageToFloatTemperValue(v1, v2);
-	return t;
+	temperCfgStructure.currentTemp = adcVoltageToFloatTemperValue(temperCfgStructure.vccVoltage, v);
 }
 
 // 初次上电ram初始化,唤醒不需要调用
@@ -140,7 +138,9 @@ void temper_resetInit(void)
 {
 	temperCnt = 0;
 	temperTimerCnt = 0;
+	memset(&temperCfgStructure, 0, sizeof(temperCfgStructure));
 	memset(&g_temperReadCfg, 0, sizeof(g_temperReadCfg));
 	memset(temperTable, 0, sizeof(temperTable));
 	// temper_sampleTemperTimerCb();	// 阻塞采集一次温度
+	temper_sampleTemper();
 }
