@@ -269,14 +269,14 @@ __STATIC int gattc_read_req_ind_handler(ke_msg_id_t const msgid, struct gattc_re
 	{
 		switch (att_idx)
 		{
-			// case PROJ_TEMPLATE_IDX_TEMP_VAL:
-			// {
-			// 	uint8_t Sendata[PROJ_TEMPLATE_SERVER_PACKET_SIZE] = {0};
-			// 	float t = temperCfgStructure.currentTemp;
-			// 	uint8 len = sprintf((char*)Sendata, "temp = %2.2f", t);
-			// 	memcpy(cfm->value, Sendata, len);
-			// }
-			// break;
+			case PROJ_TEMPLATE_IDX_TEMP_VAL:
+			{
+				uint8_t Sendata[PROJ_TEMPLATE_SERVER_PACKET_SIZE] = {0};
+				float t = temperCfgStructure.currentTemp;
+				uint8 len = sprintf((char*)Sendata, "temp = %.2f", t);
+				memcpy(cfm->value, Sendata, len);
+			}
+			break;
 
 			case PROJ_TEMPLATE_IDX_VBATT_VAL:
 			{
