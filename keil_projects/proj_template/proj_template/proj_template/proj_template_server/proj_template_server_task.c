@@ -229,7 +229,7 @@ __STATIC int gattc_read_req_ind_handler(ke_msg_id_t const msgid, struct gattc_re
 
 			case PROJ_TEMPLATE_IDX_REVPERMINUTE_VAL:
 			{
-				length = 4;
+				length = 15;
 			}
 			break;
 
@@ -287,12 +287,14 @@ __STATIC int gattc_read_req_ind_handler(ke_msg_id_t const msgid, struct gattc_re
 			}
 			break;
 
-			// case PROJ_TEMPLATE_IDX_REVPERMINUTE_VAL:
-			// {
-			// 	int16 r = revArg.targetRPM;
-			// 	memcpy(cfm->value, &r, sizeof(r));
-			// }
-			// break;
+			case PROJ_TEMPLATE_IDX_REVPERMINUTE_VAL:
+			{
+				uint8_t Sendata[PROJ_TEMPLATE_SERVER_PACKET_SIZE] = {0};
+				int16 rev = revArg.targetRPM;
+				uint8 len = sprintf((char*)Sendata, "rev = %d", rev);
+				memcpy(cfm->value, Sendata, len);
+			}
+			break;
 
 			case PROJ_TEMPLATE_IDX_S2C_USER_DESC:
 			{

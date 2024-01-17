@@ -51,7 +51,7 @@ void mcu_gpio01_isr(void)
 		}
 		else
 		{
-			TIMER_EnableInt(TIMER0);
+			TIMER_EnableInt(TIMER0);	
 			TIMER_Start(TIMER0);
 		}
 		revArg.revFlag = !revArg.revFlag;
