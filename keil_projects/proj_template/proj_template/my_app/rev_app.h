@@ -8,7 +8,7 @@ typedef struct RevArg{
 	int32	revTimerCnt;	// Timer register CNT value
 	float	revTime;		// CNT value corresponding actualtime
 	int16	revFlag;		// execute TIMER_Reset or TIMER_Start
-	int16	targetRPM;		// target Revolutions Per minute
+	uint32	targetRPM;		// target Revolutions Per minute
 }RevArg_t;
 
 

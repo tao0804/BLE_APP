@@ -290,8 +290,8 @@ __STATIC int gattc_read_req_ind_handler(ke_msg_id_t const msgid, struct gattc_re
 			case PROJ_TEMPLATE_IDX_REVPERMINUTE_VAL:
 			{
 				uint8_t Sendata[PROJ_TEMPLATE_SERVER_PACKET_SIZE] = {0};
-				int16 rev = revArg.targetRPM;
-				uint8 len = sprintf((char*)Sendata, "rev = %d", rev);
+				uint32 rpm = revArg.targetRPM;
+				uint8 len = sprintf((char*)Sendata, "rev = %d", rpm);
 				memcpy(cfm->value, Sendata, len);
 			}
 			break;

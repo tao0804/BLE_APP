@@ -42,8 +42,9 @@ void mcu_gpio01_isr(void)
 		if(revArg.revFlag)
 		{
 			revArg.revTimerCnt = TIMER_GetCounter(TIMER0);
-			revArg.revTime = revArg.revTimerCnt / (TIMER_GetModuleClock(TIMER0) / 1000);	// psc = 1
-			revArg.targetRPM = 60 * 1000 / revArg.revTime;	// 目标每分钟转速
+			revArg.revTime = revArg.revTimerCnt / (TIMER_GetModuleClock(TIMER0) / 10000);	// psc = 1
+			uint32 rpm = 60 * 10000 / revArg.revTime;
+			revArg.targetRPM = rpm;	// 目标每分钟转速
 			mcu_gpio_en_hall(FALSE);
 			TIMER_Reset(TIMER0);
 			GPIO_DisableInt(P1, 3);
@@ -53,21 +54,21 @@ void mcu_gpio01_isr(void)
 		{
 			TIMER_EnableInt(TIMER0);	
 			TIMER_Start(TIMER0);
-		}
+			}
 		revArg.revFlag = !revArg.revFlag;
+		}
 	}
-}
 
 void mcu_TMR0_isr(void)
 {
 	// indicates Timer time-out interrupt occurred or not
-	if(TIMER_GetIntFlag(TIMER0))
-	{
+if(TIMER_GetIntFlag(TIMER0))
+{
 		revArg.targetRPM = 0;	// 目标每分钟转速
-		TIMER_Reset(TIMER0);
-		TIMER_ClearIntFlag(TIMER0);
-		revArg.revFlag = !revArg.revFlag;
-	}
+TIMER_Reset(TIMER0);
+TIMER_ClearIntFlag(TIMER0);
+revArg.revFlag = !revArg.revFlag;
+}
 }
 
 void mcu_rev_init(void)
