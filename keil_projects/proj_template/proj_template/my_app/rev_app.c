@@ -39,7 +39,7 @@ void mcu_gpio01_isr(void)
 	{
 		led_setMode(LED_MODE_ON);
 		GPIO_CLR_INT_FLAG(P1, BIT3);
-		if(revArg.revFlag)
+		if(revArg.revFlag == 2)
 		{
 			revArg.revTimerCnt = TIMER_GetCounter(TIMER0);
 			revArg.revTime = revArg.revTimerCnt / (TIMER_GetModuleClock(TIMER0) / 10000);	// psc = 1
@@ -49,31 +49,32 @@ void mcu_gpio01_isr(void)
 			TIMER_Reset(TIMER0);
 			GPIO_DisableInt(P1, 3);
 			TIMER_DisableInt(TIMER0);
+			revArg.revFlag = 0;
 		}
-		else
+		else if(revArg.revFlag == 1)
 		{
 			TIMER_EnableInt(TIMER0);	
 			TIMER_Start(TIMER0);
-			}
-		revArg.revFlag = !revArg.revFlag;
+			revArg.revFlag = 2;
+		}
 		}
 	}
 
 void mcu_TMR0_isr(void)
 {
 	// indicates Timer time-out interrupt occurred or not
-if(TIMER_GetIntFlag(TIMER0))
-{
+	if(TIMER_GetIntFlag(TIMER0))
+	{
 		revArg.targetRPM = 0;	// 目标每分钟转速
-TIMER_Reset(TIMER0);
-TIMER_ClearIntFlag(TIMER0);
-revArg.revFlag = !revArg.revFlag;
-}
+		TIMER_Reset(TIMER0);
+		TIMER_ClearIntFlag(TIMER0);
+		revArg.revFlag = 0;
+	}
 }
 
 void mcu_rev_init(void)
 {
-	memset(&revArg, 0, sizeof(RevArg_t));
+	
 	mcu_rev_gpio_init();
 	GPIO_EnableInt(P1, 3, GPIO_INT_FALLING);
     NVIC_DisableIRQ(GPIO01_IRQn);	// 检测开启后再去使能
@@ -90,19 +91,29 @@ void mcu_rev_init(void)
 	// Set compare value as large as possible, so don't need to worry about counter overrun too frequently.
 	TIMER_SET_CMP_VALUE(TIMER0, 0xFFFFFF);
 
+	// 使能定时器中断前先清中断标志位
+	TIMER_ClearIntFlag(TIMER0);
 	NVIC_EnableIRQ(TMR0_IRQn);
 	((interrupt_register_handler)SVC_interrupt_register)(TMR0_IRQ, mcu_TMR0_isr);
 }
 
 void rev_start(void)
 {
+	//加保护,防止调用此接口时上一次测转速还没结束
+	if(revArg.revFlag)
+	{
+		return;
+	}
+	revArg.revFlag = 1;
 	mcu_gpio_en_hall(TRUE);
-	// delay?
+	mcu_rev_init();
+	// 使能前先清中断标志位
+	GPIO_CLR_INT_FLAG(P1, BIT3);
 	NVIC_EnableIRQ(GPIO01_IRQn);
 }
 
 void rev_resetInit(void)
 {
-	mcu_rev_init();
+	memset(&revArg, 0, sizeof(RevArg_t));
 	rev_start();
 }

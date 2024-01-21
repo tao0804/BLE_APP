@@ -45,6 +45,7 @@
 #include "mcu_hal.h"
 #include "led_app.h"
 #include "key_app.h"
+#include "rev_app.h"
 
 const app_info_t app_info __attribute__((at(APP_INFO_ADDR)))=
 {
@@ -145,7 +146,7 @@ void ble_stack_process()
 		rf_calibration_process();
 		#endif
 		
-		if (app_var.default_sleep_en)
+		if (app_var.default_sleep_en && !revArg.revFlag)
 		{
 			#if (GPIO_RETAIN_EN)
 			GPIO_Store();
