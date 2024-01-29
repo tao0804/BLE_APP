@@ -27,6 +27,7 @@
 #include "key_app.h"
 #include "rev_app.h"
 
+
 static struct app_proj_template_env_tag app_proj_template_env;
 void app_proj_template_init(void)
 {
@@ -64,7 +65,7 @@ void app_proj_template_add_server(void)
 
 	// Set parameters
 	db_cfg = (struct proj_template_server_db_cfg* ) req->param;
-	db_cfg->features = 0xffffffff;	// 注意：配置了gatt数据库，要配置这个掩码使能，32位都是1可以使能32个数据库配置
+	db_cfg->features = 0xffffffff;	// 注意：配置了gatt数据库,要配置这个掩码使能,32位都是1可以使能32个数据库配置
 
 	// Send the message
 	((ke_msg_send_handler)SVC_ke_msg_send)(req);
@@ -126,8 +127,14 @@ static int proj_template_server_peer_write_data_ind_handler(ke_msg_id_t const ms
 	
 	if(0xf3 == param->packet[0])
 	{
-		float temper = TEMPER_VALUE_TO_C(temper_getTemperValue(temper_getTemperCnt()));
-		uint8 len = sprintf((char*)Sendata, "temper = %.2f", temper);
+		// 测试透传收发ok
+		float t = temperCfgStructure.currentTemp;
+		// uint8 len = sprintf((char*)Sendata, "temp = %.2f", t);
+		float v = temperCfgStructure.vccVoltage * 2;
+		// uint8 len = sprintf((char*)Sendata, "voltage = %.1f", v);
+		uint32 rpm = revArg.targetRPM;
+		// uint8 len = sprintf((char*)Sendata, "rev = %d", rpm);
+		uint8 len = sprintf((char*)Sendata, "%.2f\n%.1f\n%d\n", t, v, rpm);
 		app_proj_template_send_value(PROJ_TEMPLATE_IDX_S2C_VAL, Sendata, len);
 	}
 #endif
@@ -182,6 +189,16 @@ static int app_key_scan_handler(ke_msg_id_t const msgid,
 	return (KE_MSG_CONSUMED);
 }
 
+static int connected_data_periodic_handler(ke_msg_id_t const msgid,
+                                     void const *param,
+                                     ke_task_id_t const dest_id,
+                                     ke_task_id_t const src_id)
+{
+	connected_data_periodicTimerOn(500);	// 5s
+	period_send_data();
+	return (KE_MSG_CONSUMED);
+}
+
 /// Default State handlers definition
 const struct ke_msg_handler app_proj_template_msg_handler_list[] =
 {
@@ -192,6 +209,7 @@ const struct ke_msg_handler app_proj_template_msg_handler_list[] =
 	{APP_SAMPLE_TEMPER_TIMER,	(ke_msg_func_t)app_sample_temper_handler},
 	{APP_LED_BLINK_TIMER,		(ke_msg_func_t)app_led_blink_handler},
 	{APP_KEY_SCAN_TIMER,		(ke_msg_func_t)app_key_scan_handler},
+	{CONNECTED_DATA_PERIODIC_TIMER,			(ke_msg_func_t)connected_data_periodic_handler},
 };
 
 const struct ke_state_handler app_proj_template_table_handler =

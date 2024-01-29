@@ -47,6 +47,9 @@ enum
 
 		// key扫描定时器
 		APP_KEY_SCAN_TIMER,
+
+		// temp, voltage, rpm周期发送数据定时器
+		CONNECTED_DATA_PERIODIC_TIMER,
 };
 
 

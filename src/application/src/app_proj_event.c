@@ -72,6 +72,8 @@
 #include "app_task.h"
 #include "stack_svc_api.h"
 
+#include "temperature.h"
+
 #if PROJ_TEMPER
 #include "led_app.h"
 #endif
@@ -226,6 +228,9 @@ void app_connection_req_ind_func ( uint8_t conidx, struct gapc_connection_req_in
 	((ke_timer_set_handler)SVC_ke_timer_set)(APP_CONN_UPDATE_TIMER, TASK_APP, 500);
 	#endif
     sys_ble_conn_flag = 1;
+	// 连上后即开始发送数据
+	period_send_data();
+	connected_data_periodicTimerOn(500);	// 5s
 
 	#if PROJ_TEMPER
 	if(ble_has_been_connected == FALSE)

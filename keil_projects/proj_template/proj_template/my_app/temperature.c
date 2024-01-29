@@ -4,6 +4,10 @@
 #include <string.h>
 #include <math.h>
 
+#include "peripherals.h"
+#include "rev_app.h"
+#include "stack_svc_api.h"
+
 const TemperCfg_t g_temperCfg = {
 	.zeroTemperValue = ZERO_TEMPER_VALUE_C * 1000,
 	.precisionTemperValue = PRECISION_TEMPER_VALUE_C * 1000,
@@ -131,6 +135,26 @@ void temper_sampleTemper(void)
 	v = v * VREF_VOLTAGE / vref;	// 校准温漂后的v
 #endif
 	temperCfgStructure.currentTemp = adcVoltageToFloatTemperValue(temperCfgStructure.vccVoltage, v);
+}
+
+void period_send_data(void)
+{
+	if(sys_ble_conn_flag == 1)
+	{
+		// 测试周期发能否用软定时器
+		uint8_t Sendata[PROJ_TEMPLATE_SERVER_PACKET_SIZE] = {0};
+		float t = temperCfgStructure.currentTemp;
+		float v = temperCfgStructure.vccVoltage * 2;
+		uint32 rpm = revArg.targetRPM;
+		uint8 len = sprintf((char*)Sendata, "%.2f\n%.1f\n%d\n", t, v, rpm);
+		// uint8 len = sprintf((char*)Sendata, "%.2f\n%.1f\n", t, v);
+		app_proj_template_send_value(PROJ_TEMPLATE_IDX_S2C_VAL, Sendata, len);
+	}
+	else
+	{
+		// 非连接状态下关闭定时器
+		connected_data_periodicTimerOff();
+	}
 }
 
 // 初次上电ram初始化,唤醒不需要调用

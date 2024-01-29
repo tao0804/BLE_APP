@@ -53,6 +53,7 @@ void mcu_gpio01_isr(void)
 		}
 		else if(revArg.revFlag == 1)
 		{
+			TIMER_Reset(TIMER0);
 			TIMER_EnableInt(TIMER0);	
 			TIMER_Start(TIMER0);
 			revArg.revFlag = 2;
