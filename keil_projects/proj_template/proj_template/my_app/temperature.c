@@ -141,14 +141,14 @@ void period_send_data(void)
 {
 	if(sys_ble_conn_flag == 1)
 	{
-		// 测试周期发能否用软定时器
-		uint8_t Sendata[PROJ_TEMPLATE_SERVER_PACKET_SIZE] = {0};
-		float t = temperCfgStructure.currentTemp;
-		float v = temperCfgStructure.vccVoltage * 2;
-		uint32 rpm = revArg.targetRPM;
-		uint8 len = sprintf((char*)Sendata, "%.2f\n%.1f\n%d\n", t, v, rpm);
-		// uint8 len = sprintf((char*)Sendata, "%.2f\n%.1f\n", t, v);
-		app_proj_template_send_value(PROJ_TEMPLATE_IDX_S2C_VAL, Sendata, len);
+		// uint8_t Sendata[PROJ_TEMPLATE_SERVER_PACKET_SIZE] = {0};
+		// float t = temperCfgStructure.currentTemp;
+		// float v = temperCfgStructure.vccVoltage * 2;
+		// uint32 rpm = revArg.targetRPM;
+		// uint8 len = sprintf((char*)Sendata, "%.2f\n%.1f\n%d\n", t, v, rpm);
+		packDate();
+		app_proj_template_send_value(PROJ_TEMPLATE_IDX_S2C_VAL, taoDataPacket.txBuff, 9);
+		taoDataPacket.checkSum = 0;
 	}
 	else
 	{
@@ -162,9 +162,48 @@ void temper_resetInit(void)
 {
 	temperCnt = 0;
 	temperTimerCnt = 0;
+	// 给数据包结构体置0
+	memset(&taoDataPacket, 0, sizeof(taoDataPacket));
 	memset(&temperCfgStructure, 0, sizeof(temperCfgStructure));
 	memset(&g_temperReadCfg, 0, sizeof(g_temperReadCfg));
 	memset(temperTable, 0, sizeof(temperTable));
 	// temper_sampleTemperTimerCb();	// 阻塞采集一次温度
 	temper_sampleTemper();
+}
+
+DataPacket_t taoDataPacket;
+
+// 封包函数
+void packDate(void)
+{
+	// 帧头1字节,固定值0xA5
+	taoDataPacket.header = 0xA5;
+	// 数据长度(6还是9)
+	taoDataPacket.length = 6;
+	// 复制到数据包中
+	// memcpy(&taoDataPacket.txBuff[0], &temperCfgStructure.currentTemp, 2);	// float强转成int指针会出问题,可以增加中间变量,let's try
+	taoDataPacket.txBuff[0] = taoDataPacket.header;
+	short currentTemp = (short)(temperCfgStructure.currentTemp * 100);
+	short vccVoltage = (short)(temperCfgStructure.vccVoltage *2 * 100);
+	short targetRPM = (short)revArg.targetRPM;
+
+	memcpy((short*)&taoDataPacket.txBuff[1], &currentTemp, 2);
+	memcpy((short*)&taoDataPacket.txBuff[3], &vccVoltage, 2);
+	memcpy((short*)&taoDataPacket.txBuff[5], &targetRPM, 2);
+
+	// let's try another way
+	// *(short*)&taoDataPacket.txBuff[1] = (short)(temperCfgStructure.currentTemp * 100);
+	// *(short*)&taoDataPacket.txBuff[3] = (short)(temperCfgStructure.vccVoltage *2 * 100);
+	// *(short*)&taoDataPacket.txBuff[5] = (short)(revArg.targetRPM);
+
+	// 计算校验和
+    for (uint8 i = 1; i <= taoDataPacket.length; i++) 
+	{
+        taoDataPacket.checkSum += taoDataPacket.txBuff[i];
+		taoDataPacket.checkSum = taoDataPacket.checkSum & 0xFF;
+    }
+	taoDataPacket.txBuff[7] = taoDataPacket.checkSum;
+	// 帧尾1字节,固定值0x5A
+	taoDataPacket.tail = 0x5A;
+	taoDataPacket.txBuff[8] = taoDataPacket.tail;
 }

@@ -34,6 +34,17 @@ typedef struct TemperReadCfg
 	uint16 startCnt;	// 从第几次采样开始读取
 	uint16 readLen;		// 读取的长度
 }TemperReadCfg_t;
+
+// 定义数据包结构
+typedef struct DataPacket
+{
+	uint8 header;
+	uint8 length;
+	uint8 txBuff[9];
+	uint8 checkSum;
+	uint8 tail;
+}DataPacket_t;
+
 #pragma pack()
 
 static void connected_data_periodicTimerOff(void)
@@ -52,6 +63,7 @@ static void connected_data_periodicTimerOn(uint16 time)
 extern const TemperCfg_t g_temperCfg;
 extern TemperCfg_t temperCfgStructure;
 extern TemperReadCfg_t g_temperReadCfg;
+extern DataPacket_t taoDataPacket;
 
 int8 temper_getTemperValue(uint16 cnt);
 uint16 temper_getTemperCnt(void);
@@ -60,5 +72,8 @@ void temper_sampleTemper(void);
 
 void period_send_data(void);
 void temper_resetInit(void);
+
+// 封包函数
+void packDate(void);
 
 #endif //__TEMPERATURE_H_
