@@ -141,11 +141,6 @@ void period_send_data(void)
 {
 	if(sys_ble_conn_flag == 1)
 	{
-		// uint8_t Sendata[PROJ_TEMPLATE_SERVER_PACKET_SIZE] = {0};
-		// float t = temperCfgStructure.currentTemp;
-		// float v = temperCfgStructure.vccVoltage * 2;
-		// uint32 rpm = revArg.targetRPM;
-		// uint8 len = sprintf((char*)Sendata, "%.2f\n%.1f\n%d\n", t, v, rpm);
 		packDate();
 		app_proj_template_send_value(PROJ_TEMPLATE_IDX_S2C_VAL, taoDataPacket.txBuff, 9);
 		taoDataPacket.checkSum = 0;
@@ -186,6 +181,10 @@ void packDate(void)
 	short currentTemp = (short)(temperCfgStructure.currentTemp * 100);
 	short vccVoltage = (short)(temperCfgStructure.vccVoltage *2 * 100);
 	short targetRPM = (short)revArg.targetRPM;
+	// if(revArg.targetRPM > 32767)
+	// 	targetRPM = 32767;
+	// else
+	// 	targetRPM = revArg.targetRPM;
 
 	memcpy((short*)&taoDataPacket.txBuff[1], &currentTemp, 2);
 	memcpy((short*)&taoDataPacket.txBuff[3], &vccVoltage, 2);

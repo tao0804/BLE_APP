@@ -14,8 +14,8 @@ static void mcu_rev_gpio_init(void)
 	GPIO_ENABLE_DIGITAL_PATH(P1, BIT2);
 	SYS->P1_MFP &= ~(SYS_MFP_P12_Msk);
 	SYS->P1_MFP |= SYS_MFP_P12_GPIO;
-	GPIO_InitOutput(P1, BIT2, GPIO_LOW_LEVEL);
-	P12 = 0;	// HALL_EN 默认不开
+	GPIO_InitOutput(P1, BIT2, GPIO_HIGH_LEVEL);
+	// P12 = 0;	// HALL_EN 默认不开
 
 	GPIO_PullUp(P1, BIT3, GPIO_PULLUP_ENABLE);	// 可能会有漏电流
 	GPIO_ENABLE_DIGITAL_PATH(P1, BIT3);
@@ -32,43 +32,61 @@ void mcu_gpio_en_hall(bool en)
 		P12 = 0;	// HALL传感器不开
 }
 
+// 计算10次下降沿减少误差
+#define REV_AVG_CNT 10
 void mcu_gpio01_isr(void)
 {
-	// GPIO_GET_INT_FLAG(P1, BIT3) will return 0 or 8
-	if(GPIO_GET_INT_FLAG(P1, BIT3))
-	{
-		led_setMode(LED_MODE_ON);
-		GPIO_CLR_INT_FLAG(P1, BIT3);
-		if(revArg.revFlag == 2)
-		{
-			revArg.revTimerCnt = TIMER_GetCounter(TIMER0);
-			revArg.revTime = revArg.revTimerCnt / (TIMER_GetModuleClock(TIMER0) / 10000);	// psc = 1
-			uint32 rpm = 60 * 10000 / revArg.revTime;
-			revArg.targetRPM = rpm;	// 目标每分钟转速
-			mcu_gpio_en_hall(FALSE);
-			TIMER_Reset(TIMER0);
-			GPIO_DisableInt(P1, 3);
-			TIMER_DisableInt(TIMER0);
-			revArg.revFlag = 0;
-		}
-		else if(revArg.revFlag == 1)
-		{
-			TIMER_Reset(TIMER0);
-			TIMER_EnableInt(TIMER0);	
-			TIMER_Start(TIMER0);
-			revArg.revFlag = 2;
-		}
-		}
+    // GPIO_GET_INT_FLAG(P1, BIT3) will return 0 or 8
+    if(GPIO_GET_INT_FLAG(P1, BIT3))
+    {
+        led_setMode(LED_MODE_ON);
+        GPIO_CLR_INT_FLAG(P1, BIT3);
+        if(revArg.revFlag == 2)
+        {
+            revArg.cnt++;
+            revArg.revTimerCnt = TIMER_GetCounter(TIMER0);
+            revArg.revTime = revArg.revTimerCnt / (TIMER_GetModuleClock(TIMER0) / 10000);   // psc = 1
+            if(revArg.cnt < REV_AVG_CNT)
+            {
+                revArg.sumTime += revArg.revTime;
+				TIMER_Reset(TIMER0);
+				TIMER_Start(TIMER0);
+            }
+			else 
+			{
+				uint32 rpm = 60 * 10000 / (revArg.sumTime / REV_AVG_CNT);
+				revArg.targetRPM = rpm; // 目标每分钟转速
+				// mcu_gpio_en_hall(FALSE);	// P12在rev项目开始前被占用了
+				TIMER_Reset(TIMER0);
+				GPIO_DisableInt(P1, 3);
+				TIMER_DisableInt(TIMER0);
+				revArg.revFlag = 0;
+			}
+        }
+        else if(revArg.revFlag == 1)
+        {
+            TIMER_Reset(TIMER0);
+            TIMER_EnableInt(TIMER0);
+            TIMER_Start(TIMER0);
+            revArg.revFlag = 2;
+			revArg.cnt = 0;
+			revArg.sumTime = 0;
+        }
 	}
+}
 
 void mcu_TMR0_isr(void)
 {
 	// indicates Timer time-out interrupt occurred or not
 	if(TIMER_GetIntFlag(TIMER0))
 	{
-		revArg.targetRPM = 0;	// 目标每分钟转速
+		revArg.targetRPM = 0;	// 目标每分钟转速按需求:渐变
+		// uint8_t Sendata[PROJ_TEMPLATE_SERVER_PACKET_SIZE] = {0};
+		// uint32 rpm = revArg.targetRPM;
+		// uint8 len = sprintf((char*)Sendata, "rev = %d", rpm);	// 先提交
 		TIMER_Reset(TIMER0);
 		TIMER_ClearIntFlag(TIMER0);
+		GPIO_DisableInt(P1, 3);
 		revArg.revFlag = 0;
 	}
 }
@@ -108,6 +126,8 @@ void rev_start(void)
 	revArg.revFlag = 1;
 	mcu_gpio_en_hall(TRUE);
 	mcu_rev_init();
+	TIMER_EnableInt(TIMER0);	
+	TIMER_Start(TIMER0);
 	// 使能前先清中断标志位
 	GPIO_CLR_INT_FLAG(P1, BIT3);
 	NVIC_EnableIRQ(GPIO01_IRQn);

@@ -5,6 +5,8 @@
 
 
 typedef struct RevArg{
+	uint16	cnt;			// 求cnt次求平均值
+	float	sumTime;		// 所用时间
 	int32	revTimerCnt;	// Timer register CNT value
 	float	revTime;		// CNT value corresponding actualtime
 	int16	revFlag;		// execute TIMER_Reset or TIMER_Start
