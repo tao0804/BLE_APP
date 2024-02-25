@@ -25,7 +25,7 @@
 #define ENABLE_UART0			(0)
 #define ENABLE_UART1			(0)
 #define USE_EXT_32K 	        (0) //macro of use external 32k 		
-#define SLEEP_EN		        (0) //maro of whether to use low power
+#define SLEEP_EN		        (1) //maro of whether to use low power
 #define PN102B			        (1)
 #define SET_CUSTOME_ADDR		(0)
 #if(SLEEP_EN == 1)
@@ -34,9 +34,9 @@
 #define EXT_WAKEUP				(0)	//sleep mode,P52 wakeup 
 #endif
 #define XN297_MODE_EN			(0) //2.4g mode with xn297
-#define RF_CLOSE_EN				(0)	//ä½¿èƒ½åï¼Œmcuå·¥ä½œå…³é—­rfã€‚
-#define GPIO_RETAIN_EN			(0) //ä½¿èƒ½GPIOä¿æŒåŠŸèƒ½
-#define SPROM_DEC				(0)	//åœ¨PAN1020Toolç»™SPROMåŠ å¯†åï¼Œéœ€è¦ä½¿èƒ½å®ã€‚ä¿è¯flashç¨‹åºçš„å®‰å…¨
+#define RF_CLOSE_EN				(0)	//Ê¹ÄÜºó£¬mcu¹¤×÷¹Ø±Õrf¡£
+#define GPIO_RETAIN_EN			(0) //Ê¹ÄÜGPIO±£³Ö¹¦ÄÜ
+#define SPROM_DEC				(0)	//ÔÚPAN1020Tool¸øSPROM¼ÓÃÜºó£¬ĞèÒªÊ¹ÄÜºê¡£±£Ö¤flash³ÌĞòµÄ°²È«
 #define TEMP_CHANGE_CALIB		(0)	//Detect temperature change calibration two-point
 
 

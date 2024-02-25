@@ -39,7 +39,7 @@ void app_proj_template_init(void)
 			函数调用关系：ble_normal_reset_init() -> user_code_start() -> appm_init() -> app_init_ind_func()
 			设置定时器放在appm_init()内部没问题，但是放在appm_init()外部就不行，
 			甚至把设置定时器放在appm_init()内部的最后一行可以，放在appm_init()执行完出来的下一行不行！*/
-	((ke_timer_set_handler)SVC_ke_timer_set)(APP_SAMPLE_TEMPER_TIMER, TASK_APP, 1*100);
+	((ke_timer_set_handler)SVC_ke_timer_set)(APP_SAMPLE_TEMPER_TIMER, TASK_APP, 5*100);
 
 	led_resetInit();
 	key_resetInit();
@@ -167,7 +167,7 @@ static int app_sample_temper_handler(ke_msg_id_t const msgid,
 	rev_start();
 	// rev_resetInit();	// 上下顺序很重要,adc采样完成有阻塞
 	temper_sampleTemper();
-	((ke_timer_set_handler)SVC_ke_timer_set)(APP_SAMPLE_TEMPER_TIMER, TASK_APP, 1*100);	// 开启下一次定时
+	((ke_timer_set_handler)SVC_ke_timer_set)(APP_SAMPLE_TEMPER_TIMER, TASK_APP, 5*100);	// 开启下一次定时
 	return (KE_MSG_CONSUMED);
 }
 
@@ -194,7 +194,7 @@ static int connected_data_periodic_handler(ke_msg_id_t const msgid,
                                      ke_task_id_t const dest_id,
                                      ke_task_id_t const src_id)
 {
-	connected_data_periodicTimerOn(100);	// 5s
+	connected_data_periodicTimerOn(500);	// 5s
 	period_send_data();
 	return (KE_MSG_CONSUMED);
 }
