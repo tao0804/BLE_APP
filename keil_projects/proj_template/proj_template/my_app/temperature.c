@@ -180,11 +180,11 @@ void packDate(void)
 	taoDataPacket.txBuff[0] = taoDataPacket.header;
 	short currentTemp = (short)(temperCfgStructure.currentTemp * 100);
 	short vccVoltage = (short)(temperCfgStructure.vccVoltage *2 * 100);
-	short targetRPM = (short)revArg.targetRPM;
-	// if(revArg.targetRPM > 32767)
-	// 	targetRPM = 32767;
-	// else
-	// 	targetRPM = revArg.targetRPM;
+	short targetRPM;
+	if(revArg.targetRPM > 32767)
+		targetRPM = 32767;
+	else
+		targetRPM = revArg.targetRPM;
 
 	memcpy((short*)&taoDataPacket.txBuff[1], &currentTemp, 2);
 	memcpy((short*)&taoDataPacket.txBuff[3], &vccVoltage, 2);

@@ -54,6 +54,7 @@ void mcu_gpio01_isr(void)
             }
 			else 
 			{
+                revArg.sumTime += revArg.revTime;
 				uint32 rpm = 60 * 10000 / (revArg.sumTime / REV_AVG_CNT);
 				revArg.targetRPM = rpm; // 目标每分钟转速
 				// mcu_gpio_en_hall(FALSE);	// P12在rev项目开始前被占用了
