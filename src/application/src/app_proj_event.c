@@ -230,7 +230,7 @@ void app_connection_req_ind_func ( uint8_t conidx, struct gapc_connection_req_in
     sys_ble_conn_flag = 1;
 	// 连上后即开始发送数据
 	period_send_data();
-	connected_data_periodicTimerOn(100);	// 5s
+	connected_data_periodicTimerOn(500);	// 5s
 
 	#if PROJ_TEMPER
 	if(ble_has_been_connected == FALSE)
