@@ -132,43 +132,61 @@ static KeyCfg_t keyCfg;
 
 void key_eventCB(KeyEvents_t event, uint8 pressCnt)
 {
-	if (event == KEY_PRESSED && pressCnt == 0) {
-		// 首次按下清标志位
-		keyUserInfo.flag = KEY_NO_FLAG;
-	}
+	// if (event == KEY_PRESSED && pressCnt == 0) {
+	// 	// 首次按下清标志位
+	// 	keyUserInfo.flag = KEY_NO_FLAG;
+	// }
 
-	if (keyUserInfo.runMode) {
-		if (event == KEY_PRESS_3SECS && pressCnt == 0) {
-			// 长按3s触发解锁按键
-			keyUserInfo.flag = KEY_3SECS_UNLOCK_FLAG;
-		} else if (event == KEY_PRESS && pressCnt == 1) {
-			if (keyUserInfo.flag == KEY_3SECS_UNLOCK_FLAG) {
-				// 解锁后再按下就让POW_EN拉低，在用户释放按键时完全断电
-				keyUserInfo.flag = KEY_POWER_OFF_FLAG;
-				mcu_gpio_en_pow(FALSE);
-			}
-		} else if (event == KEY_RELEASE) {
-			if (keyUserInfo.flag == KEY_NO_FLAG) {
-				// 未解锁按键，在释放按键时重置按键
-				key_taskReset();
-			}
-		}
-	} else {
-		if (event == KEY_PRESS_1SECS) {
-			// 长按1s开机
-			mcu_gpio_en_pow(TRUE);
-			keyUserInfo.flag = KEY_POWER_ON_FLAG;
-		} else if (event == KEY_RELEASE) {
-			if (keyUserInfo.flag == KEY_NO_FLAG) {
-				// 未长按1s在释放按键时下电
-				mcu_gpio_en_pow(FALSE);
-			}
-		} else if (event == KEY_SCAN_END) {
-			if (keyUserInfo.flag == KEY_POWER_ON_FLAG) {
-				// 等按键扫描任务结束再置runMode，防止开机后立马又被按下
-				keyUserInfo.runMode = TRUE;
-			}
-		}
+	// if (keyUserInfo.runMode) {
+	// 	if (event == KEY_PRESS_3SECS && pressCnt == 0) {
+	// 		// 长按3s触发解锁按键
+	// 		keyUserInfo.flag = KEY_3SECS_UNLOCK_FLAG;
+	// 	} else if (event == KEY_PRESS && pressCnt == 1) {
+	// 		if (keyUserInfo.flag == KEY_3SECS_UNLOCK_FLAG) {
+	// 			// 解锁后再按下就让POW_EN拉低，在用户释放按键时完全断电
+	// 			keyUserInfo.flag = KEY_POWER_OFF_FLAG;
+	// 			mcu_gpio_en_pow(FALSE);
+	// 		}
+	// 	} else if (event == KEY_RELEASE) {
+	// 		if (keyUserInfo.flag == KEY_NO_FLAG) {
+	// 			// 未解锁按键，在释放按键时重置按键
+	// 			key_taskReset();
+	// 		}
+	// 	}
+	// } else {
+	// 	if (event == KEY_PRESS_1SECS) {
+	// 		// 长按1s开机
+	// 		mcu_gpio_en_pow(TRUE);
+	// 		keyUserInfo.flag = KEY_POWER_ON_FLAG;
+	// 	} else if (event == KEY_RELEASE) {
+	// 		if (keyUserInfo.flag == KEY_NO_FLAG) {
+	// 			// 未长按1s在释放按键时下电
+	// 			mcu_gpio_en_pow(FALSE);
+	// 		}
+	// 	} else if (event == KEY_SCAN_END) {
+	// 		if (keyUserInfo.flag == KEY_POWER_ON_FLAG) {
+	// 			// 等按键扫描任务结束再置runMode，防止开机后立马又被按下
+	// 			keyUserInfo.runMode = TRUE;
+	// 		}
+	// 	}
+	// }
+	
+	if (event == KEY_PRESS_1SECS) {
+		// 长按3s置关机flag
+		keyUserInfo.flag = KEY_POWER_ON_FLAG;
+	} else if (event == KEY_PRESS_3SECS) {
+		// 长按3s置关机flag
+		keyUserInfo.flag = KEY_POWER_OFF_FLAG;
+	} else if (event == KEY_RELEASE && keyUserInfo.flag == KEY_POWER_OFF_FLAG) {
+		// 松开时关机，防止一直按着，一关机就被唤醒
+		sys_power_flag = 1;
+		app_var.ext_wakeup_enable = 1;
+		key_taskReset();
+	} else if (event == KEY_RELEASE && keyUserInfo.flag == KEY_PRESS_1SECS) {
+		// 长按1s开机
+		sys_power_flag = 0;
+		app_var.ext_wakeup_enable = 0;
+		key_taskReset();
 	}
 }
 

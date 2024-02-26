@@ -77,7 +77,7 @@ void ble_sleep_wakeup_init()
 	((ke_event_set_handler)SVC_ke_event_set)(KE_EVENT_BLE_EVT_START);			//Start ble event after wake up
 	#if(EXT_WAKEUP)
 	wakeup_cnt++;
-	printf("wk\n");
+	// printf("wk\n");
 	#endif
 }
 
@@ -124,19 +124,19 @@ void ble_stack_process()
 	while (1)
 	{
 		#if(EXT_WAKEUP)
-		if(P52 == 1)				//检测P52高电平 
-		{
-			printf("P52 1\n");
-		}
-		else						//检测P52低电平 
-		{
-			if(wakeup_cnt >= 100)	//int 100ms.mcu work 10s，then into deep sleep
-			{
-				wakeup_cnt = 0;
-				printf("P52 0\n");
-				sys_power_flag = 1;
-			}
-		}
+		// if(P52 == 1)				//检测P52高电平 
+		// {
+		// 	printf("P52 1\n");
+		// }
+		// else						//检测P52低电平 
+		// {
+		// 	if(wakeup_cnt >= 100)	//int 100ms.mcu work 10s，then into deep sleep
+		// 	{
+		// 		wakeup_cnt = 0;
+		// 		printf("P52 0\n");
+		// 		sys_power_flag = 1;
+		// 	}
+		// }
 		#endif
 		((bleip_schedule_handler)SVC_bleip_schedule)();
 		((rc_check_period_calib_handler)SVC_rc_check_period_calib)();
@@ -163,7 +163,7 @@ void ble_stack_process()
 					sys_sleep_flag = 0;
 					((ke_event_set_handler)SVC_ke_event_set)(KE_EVENT_BLE_EVT_START);
 					#if(EXT_WAKEUP)
-					wakeup_cnt++;
+					// wakeup_cnt++;
 					printf("wk\n");
 					#endif
 				}

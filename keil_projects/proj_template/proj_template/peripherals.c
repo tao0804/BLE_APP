@@ -131,7 +131,8 @@ void sys_clear_global_var(void)
 	app_var.Gpio_retain_en = GPIO_RETAIN_EN;
 	app_var.default_sleep_en = SLEEP_EN;
 	app_var.default_tx_power = TX_POWER_0DBM;
-	app_var.ext_wakeup_enable = EXT_WAKEUP;
+	// app_var.ext_wakeup_enable = EXT_WAKEUP;
+	app_var.ext_wakeup_enable = 0;	// 开机模式下不使能wakeup
 	app_var.RF_mode_select = XN297_MODE_EN;
 }
 
